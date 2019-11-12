@@ -1,0 +1,292 @@
+---
+title: "Global Warming Visualisation"
+output: 
+    html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r libraries}
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(viridis)
+library(animation)
+library(maps)
+```
+
+```{r loaddata}
+gtemps = read_csv('data/GlobalLandTemperaturesByCountry-cleaned.csv') %>%
+  mutate(LandMinTemperature = as.numeric(LandMinTemperature),
+         LandMaxTemperature = as.numeric(LandMaxTemperature),
+         LandAndOceanAverageTemperature = as.numeric(LandAndOceanAverageTemperature),
+         yearDt = year(dt),
+         monthDt = month(dt),
+         decadeDt = round(year(dt),-1),
+         monthNames = format(dt,"%b"))
+
+
+monthNames = format(as.Date(paste0('2000-',1:12,'-01'),'%Y-%m-%d'),"%b")
+```
+
+# With thanks to...
+
+* [http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html](http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html)
+
+# Big picture: rising temperatures
+
+```{r bp}
+gtemps %>%
+    group_by(yearDt) %>%
+    summarise(LandAverageTemperature = mean(LandAverageTemperature,na.rm=TRUE)) %>%
+    ggplot(aes( x=yearDt,
+                        y=LandAverageTemperature,
+                        colour=LandAverageTemperature)) +
+    geom_point(alpha=0.25) +
+    theme(panel.background = element_rect(fill='white')) +
+    scale_color_viridis()
+```
+
+## Every month shows this rising trend
+
+```{r bpMfacet}
+ggplot(data=gtemps %>% filter(between(monthDt,1,12)),aes( x=yearDt,
+                        y=LandAverageTemperature,
+                        colour=LandAverageTemperature)) +
+    geom_point(alpha=0.1) +
+    theme(panel.background = element_rect(fill='white')) +
+    facet_wrap(~monthDt)+
+    scale_color_viridis()
+```
+
+# Repeating the classic
+An attempt to reproduce the genius that is the [circle chart](http://blogs.reading.ac.uk/climate-lab-book/files/2016/05/spiral_optimized.gif) of global temperatures.
+
+Months go around the clock face, years appear as a new circle each year. Each line indicates how far above (towards the outside of the circle) or below (towards the centre) the average temperature (in black) that month was.
+
+```{r repeatClassic, results='hide'}
+#filter to reliabl data (tbc 1850 or later?) and compute average temp for each month
+gtempsFiltered = gtemps %>%
+  filter(yearDt > 1850) %>%
+  group_by(monthDt) %>%
+  mutate(meanMthTemp = mean(LandAverageTemperature,na.rm=TRUE)) %>%
+  ungroup() %>%
+  mutate(differenceFromMean = LandAverageTemperature - meanMthTemp)
+
+# To make it look nice add a special '0' row to each year or the previous year's december
+gtempsAdj = gtempsFiltered %>%
+  filter(monthDt == 12) %>%
+  mutate(monthDt = 0,
+         yearDt = yearDt + 1) %>%
+  bind_rows(gtempsFiltered) %>%
+  select(dt, yearDt, differenceFromMean, monthDt) %>%
+  arrange(dt) 
+
+startYear = min(gtempsAdj$yearDt,na.rm=TRUE)
+endYear = max(gtempsAdj$yearDt,na.rm=TRUE)-1
+
+saveGIF(
+{
+    for (i in startYear:endYear){
+     #for (i in 2000:2012){   
+    #for (i in 1975:2015){
+        #message('processing year: ',i)
+        ggp = gtempsAdj %>%
+            filter(yearDt <= i) %>%
+            ggplot(aes(x=monthDt,y=differenceFromMean,colour=yearDt,group=yearDt)) +
+                geom_line(data=gtempsAdj[gtempsAdj$yearDt==i,],colour='red')+
+                geom_path(alpha=0.1,na.rm=TRUE) +
+                geom_hline(yintercept = 0,colour='black') + #the average variation from mean (=0)
+                theme(panel.background = element_rect(fill='white')) +
+                coord_polar(theta = 'x') + 
+                scale_color_viridis(option='magma') +
+                theme(axis.title.x=element_blank(),
+                    axis.ticks.x=element_blank()) + 
+                theme(axis.title.y=element_blank(),
+                    axis.text.y=element_blank(),
+                    axis.ticks.y=element_blank()) +
+                scale_x_continuous(labels=c('Dec',monthNames),breaks=0:12) +
+                theme(legend.position = 'none') +
+                annotate('text',x=12,y=-2,label=as.character(i))+
+                ylim(-2,2.5)+
+                ggtitle('Variation from monthly average temperature')
+        print(ggp)
+    }
+
+    ggp = gtempsAdj %>%
+            ggplot(aes(x=monthDt,y=differenceFromMean,colour=yearDt,group=yearDt)) +
+                geom_path(alpha=0.1,na.rm=TRUE) +
+                geom_hline(yintercept = 0,colour='black') + #the average variation from mean (=0)
+                theme(panel.background = element_rect(fill='white')) +
+                coord_polar(theta = 'x') + 
+                scale_color_viridis(option='magma') +
+                theme(axis.title.x=element_blank(),
+                    axis.ticks.x=element_blank()) + 
+                theme(axis.title.y=element_blank(),
+                    axis.text.y=element_blank(),
+                    axis.ticks.y=element_blank()) +
+                scale_x_continuous(labels=c('Dec',monthNames),breaks=0:12) +
+                theme(legend.position = 'none') +
+                annotate('text',x=12,y=-2,label=as.character(endYear))+
+                ylim(-2,2.5)+
+                ggtitle('Variation from monthly average temperature over time')
+    print(ggp)
+    
+    #pause on final graph
+    for (i in 1:20){
+        print(ggp)
+    }
+    
+    }
+,movie.name='evolvingTemps.gif', interval = 0.1, convert = "convert", ani.width = 500, 
+ani.height = 500)
+```
+![](evolvingTemps.gif)
+
+
+# Mapping temperatures
+
+```{r loadmapdata}
+gCountryTemps = read_csv('../input/GlobalLandTemperaturesByCountry.csv') %>%
+  mutate(AverageTemperature = as.numeric(AverageTemperature),
+         yearDt = year(dt),
+         monthDt = month(dt),
+         decadeDt = round(year(dt),-1)) %>%
+  mutate(Country = if_else(Country=='United States','USA',Country),
+         Country = if_else(Country=='United Kingdom' | Country=='United Kingdom (Europe)','UK',Country),
+         Country = if_else(Country=='Congo (Democratic Republic Of The)','Democratic Republic of the Congo',Country),
+         Country = if_else(Country=='Congo','Republic of Congo',Country),
+         Country = if_else(Country=='Burma','Myanmar',Country),
+         Country = if_else(Country=='Côte D_Ivoire','Ivory Coast',Country),
+         Country = if_else(Country=='Guinea Bissau','Guinea-Bissau',Country),
+         Country = if_else(Country=='Bosnia And Herzegovina','Bosnia and Herzegovina',Country)
+         )
+   
+gCountryTemps = gCountryTemps %>%
+  bind_rows(gCountryTemps %>% filter(Country=='Sudan') %>% mutate(Country='South Sudan'))
+
+gCountryTemps = gCountryTemps %>%
+  filter(yearDt >= 1900) %>%
+  group_by(Country) %>%
+  mutate(meanTemp = mean(AverageTemperature,na.rm=TRUE)) %>%
+  ungroup()
+
+gCountryTempsAnnual = gCountryTemps %>%
+  group_by(Country,yearDt) %>%
+  summarise(meanTemp = mean(meanTemp,na.rm=TRUE), #identity operation
+           AverageTemperature = mean(AverageTemperature,na.rm=TRUE)) %>%
+  mutate(tempAboveBelowAverage = AverageTemperature - meanTemp)
+
+wMap = as.tibble(map_data('world')) %>%
+  mutate(Country = region)
+
+
+```
+
+## What does a typical year look like? (2013)
+
+```{r typicalYear, results='hide'}
+
+gTempsTypicalYear = gCountryTemps %>%
+    filter(yearDt==2000,
+            between(monthDt,1,12))
+
+allTimeLow = min(gTempsTypicalYear$AverageTemperature,na.rm=TRUE)
+allTimeHigh = max(gTempsTypicalYear$AverageTemperature,na.rm=TRUE)
+
+
+saveGIF({
+    
+    ggp = ggplot()
+    
+    for (m in 1:12){
+        #message('year ',y)
+        
+        gCountryTempsMap = wMap %>%
+          left_join(gTempsTypicalYear %>% 
+          filter(monthDt == m), by='Country') %>%
+          filter(between(monthDt,1,12))
+          
+        localLow = min(gCountryTempsMap$AverageTemperature,na.rm=TRUE)
+        localHigh = max(gCountryTempsMap$AverageTemperature,na.rm=TRUE)
+        colourScaleStart = (localLow - allTimeLow) / (allTimeHigh - allTimeLow)
+        colourScaleEnd = 1 - (allTimeHigh - localHigh) / (allTimeHigh - allTimeLow)
+        
+        
+        ggp = ggplot() + 
+          geom_polygon(data = gCountryTempsMap, aes(x=long, y = lat, group = group, fill=AverageTemperature)) +
+          scale_fill_viridis(option='inferno',begin=colourScaleStart,end=colourScaleEnd) +
+          coord_fixed(1.3) + 
+          ggtitle(paste0('Temperature by country'),subtitle='Year = 2000') +
+          theme(panel.background = element_rect(fill='lightsteelblue1')) +
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+          theme(legend.position="none") +
+          facet_wrap(~monthDt)
+        print(ggp)
+    }
+    
+    #pause on last map
+    for (i in 1:20){
+        print(ggp)
+    }
+    
+    
+},movie.name='mappingTempsMonthly.gif', interval = 0.2, convert = "convert", ani.width = 1000, 
+ani.height = 600)
+```
+![](mappingTempsMonthly.gif)
+
+## Mapping the growth in temperatures
+
+```{r mappingGrowth, results='hide'}
+allTimeLow = min(gCountryTempsAnnual$tempAboveBelowAverage,na.rm=TRUE)
+allTimeHigh = max(gCountryTempsAnnual$tempAboveBelowAverage,na.rm=TRUE)
+
+saveGIF({
+    
+    ggp = ggplot()
+    
+    for (y in 1900:2012){
+        #message('year ',y)
+        
+        gCountryTempsMap = wMap %>%
+          left_join(gCountryTempsAnnual %>% 
+              filter(yearDt == y), by='Country')
+        
+        localLow = min(gCountryTempsMap$tempAboveBelowAverage,na.rm=TRUE)
+        localHigh = max(gCountryTempsMap$tempAboveBelowAverage,na.rm=TRUE)
+        colourScaleStart = (localLow - allTimeLow) / (allTimeHigh - allTimeLow)
+        colourScaleEnd = 1 - (allTimeHigh - localHigh) / (allTimeHigh - allTimeLow)
+        
+        
+        ggp = ggplot() + 
+          geom_polygon(data = gCountryTempsMap, aes(x=long, y = lat, group = group, fill=tempAboveBelowAverage)) +
+          scale_fill_viridis(option='inferno',begin=colourScaleStart,end=colourScaleEnd) +
+#          scale_fill_viridis(option='inferno') +
+          coord_fixed(1.3) + #http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html
+          ggtitle(paste0('Temperature above/below average by country and year. Year = ',y)) +
+          theme(panel.background = element_rect(fill='lightsteelblue1')) +
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+          theme(legend.position="none")
+        print(ggp)
+    }
+    
+    #pause on last map
+    for (i in 1:20){
+        print(ggp)
+    }
+    
+    
+},movie.name='mappingTemps.gif', interval = 0.2, convert = "convert", ani.width = 1000, 
+ani.height = 600)
+
+#message('done')
+```
+
+Brighter colours indicate the country is experience higher temperatures than its average, darker shades below average. Note that trend over time is for all countries to experience rising temperatures (temperatures abover their average).
+
+The last decade is spectacular.
+
+![](mappingTemps.gif)
