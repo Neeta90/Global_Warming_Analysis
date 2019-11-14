@@ -27,6 +27,24 @@ More acidic oceans
 
 Higher sea levels
 
+Following ways to Stop Global Warming:
+
+-  Change a light.Replacing one regular light bulb with a compact fluorescent 	
+  light bulb will save 150 pounds of carbon dioxide a year.
+
+-  Drive less. Walk, bike, carpool or take mass transit more often.
+
+-  Recycle more. 
+
+-  Check your tires. 
+
+-  Use less hot water. 
+
+-  Avoid products with a lot of packaging.
+
+-  Adjust your thermostat. 
+
+-  Plant a tree.
 
 
 
