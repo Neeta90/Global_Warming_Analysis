@@ -46,6 +46,8 @@ Following ways to Stop Global Warming:
 
 -  Plant a tree.
 
+This repository contains the analysis and visualizations created in Tableau.
+
 
 
 https://public.tableau.com/profile/neeta.shrivastava#!/vizhome/GlobalWarmingAnalysis/Story1?publish=yes
