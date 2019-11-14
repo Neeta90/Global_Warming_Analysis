@@ -1,5 +1,8 @@
 # Global_Warming_Analysis
 
+
+This repository contains the analysis and visualizations created in Tableau.
+
 The Earth is in a constant state of climate change. 
 Earth has experienced many cycles of global warming and cooling. 
 The warm and cold periods can last from thousands to millions of years.
@@ -46,7 +49,6 @@ Following ways to Stop Global Warming:
 
 -  Plant a tree.
 
-This repository contains the analysis and visualizations created in Tableau.
 
 
 
