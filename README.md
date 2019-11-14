@@ -6,5 +6,13 @@ The warm and cold periods can last from thousands to millions of years.
 Right now, many scientists who study environmental sciences believe the climate is warming. 
 The Earth's temperature has increased by one degree Fahrenheit in the last hundred years. This may seem like a very tiny change, but even a tiny change in the climate has huge consequences.
 
+Global surface temperature has increased by around 1.8°F (1.0°C) since the late 1800s. 
+More than half of this increase has occurred since the 1970s, and every decade since then has been warmer than the one before it.
+Major changes in global climate have occurred throughout our planet's history – long before humans could possibly have been a factor. 
+Researchers overwhelmingly agree that the main cause of recent global warming is the addition of greenhouse gases to the atmosphere (primarily carbon dioxide) through the burning of fossil fuels. 
+Greenhouse gases warm the climate by allowing sunlight to reach Earth but absorbing radiation from Earth before it escapes to space. 
+The amount of carbon dioxide in the atmosphere has increased every year for more than 60 years; it is now about 30% greater than it was in the 1950s.
+
+
 
 https://public.tableau.com/profile/neeta.shrivastava#!/vizhome/GlobalWarmingAnalysis/Story1?publish=yes
