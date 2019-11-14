@@ -1,0 +1,117 @@
+
+* {
+  box-sizing: border-box;
+  font-family: Ubuntu, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+/* Navbar */
+.navbar{
+  max-height: 70px; 
+}
+.navigation .navbar-brand{
+  color: white; 
+  margin-left: 30px; 
+  padding: inherit; 
+  font-weight: bold; 
+  background-color: #0BADA6;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+.navbar{
+  background-color: white; 
+  font-size: 15px; 
+}
+
+.tableauPlaceholder{
+    width:600px;
+    height:600px;
+}
+
+
+
+a{
+  color: rgb(19, 25, 31);
+  font-size: 15px; 
+}
+/* The wrapper contains all of the page's content besides the footer, which is pushed to the bottom of the page */
+
+.row {
+  background: rgba(177, 177, 72, 0.952);
+  position: relative;
+  padding-bottom: 130px;
+  overflow: auto;
+}
+
+
+
+
+
+
+.filters .panel-body {
+  padding: 0;
+}
+
+.filters {
+  margin-top: 10px;
+}
+
+
+select {
+  display: block;
+  width: 50%;
+  padding: 8px;
+  color: #8e979f;
+  outline: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* keyframe animations which will be used to animate the title */
+@keyframes title {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    font-size: 7.5rem;
+    opacity: 1;
+  }
+}
+
+@keyframes smaller-title {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    font-size: 5.5rem;
+    opacity: 1;
+  }
+}
+
+@keyframes subtitle {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
