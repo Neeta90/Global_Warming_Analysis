@@ -13,6 +13,13 @@ Researchers overwhelmingly agree that the main cause of recent global warming is
 Greenhouse gases warm the climate by allowing sunlight to reach Earth but absorbing radiation from Earth before it escapes to space. 
 The amount of carbon dioxide in the atmosphere has increased every year for more than 60 years; it is now about 30% greater than it was in the 1950s.
 Consequences  of Global warming :
+More frequent and severe weather
+Higher death rates
+Dirtier air
+Higher wildlife extinction rates
+More acidic oceans
+Higher sea levels
+
 
 
 
